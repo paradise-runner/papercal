@@ -1,7 +1,5 @@
 import os
 import requests
-import random
-import time
 from pathlib import Path
 
 from parse_ical import parse_calendar_events
