@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PaperCal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #f7f7fa;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      margin-top: 48px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: #555;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .subtitle div {
+      margin-bottom: 0.5em;
+    }
+    .gif-container {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.07);
+      padding: 24px;
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 540px;
+    }
+    .gif-container img {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      background: #eee;
+    }
+    .links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .links a {
+      text-decoration: none;
+      color: #fff;
+      background: #222;
+      padding: 0.7em 1.6em;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.18s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .links a:hover {
+      background: #fff;
+      color: #000;
+    }
+    footer {
+      margin-top: auto;
+      padding: 2rem 0 1rem 0;
+      color: #aaa;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      .gif-container {
+        padding: 10px;
+        max-width: 98vw;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PaperCal</h1>
+    <div class="subtitle">
+      <div>Generate beautiful, always-up-to-date e-ink calendars from your .ics files.</div>
+      <div>Overlay dithered images that reveal themselves as days pass.</div>
+      <div>Perfect for e-paper displays powered by ESP32.</div>
+    </div>
+  </header>
+  <div class="gif-container">
+    <img src="calendar.gif" alt="PaperCal animated calendar preview">
+  </div>
+  <div class="links">
+    <a href="https://github.com/paradise-runner/papercal" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://hec.works" target="_blank" rel="noopener">Developer</a>
+  </div>
+  <footer>
+    &copy; 2025 <a href="https://hec.works" style="color:inherit;text-decoration:underline;">hec.works</a> &mdash; Inspired by Tokaido 🌊
+  </footer>
+</body>
+</html>
