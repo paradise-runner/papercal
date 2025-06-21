@@ -1,0 +1,217 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp//Example Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+
+BEGIN:VEVENT
+UID:20250615-event1@example.com
+DTSTART:20250615T080000
+DTEND:20250615T090000
+SUMMARY:Team Standup Meeting
+DESCRIPTION:Daily team synchronization and progress updates
+LOCATION:Conference Room A
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250615-event2@example.com
+DTSTART:20250615T130000
+DTEND:20250615T143000
+SUMMARY:Client Presentation
+DESCRIPTION:Quarterly business review with key stakeholders
+LOCATION:Board Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250615-event3@example.com
+DTSTART:20250615T160000
+DTEND:20250615T170000
+SUMMARY:Project Planning Session
+DESCRIPTION:Planning for upcoming product launch initiatives
+LOCATION:Meeting Room B
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250616-event1@example.com
+DTSTART:20250616T090000
+DTEND:20250616T103000
+SUMMARY:Budget Review Meeting
+DESCRIPTION:Monthly financial review and budget allocation
+LOCATION:Finance Conference Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250616-event2@example.com
+DTSTART:20250616T110000
+DTEND:20250616T120000
+SUMMARY:Marketing Strategy Discussion
+DESCRIPTION:Q3 marketing campaign planning and strategy alignment
+LOCATION:Marketing Office
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250616-event3@example.com
+DTSTART:20250616T140000
+DTEND:20250616T153000
+SUMMARY:Technical Architecture Review
+DESCRIPTION:System design review and technical documentation
+LOCATION:Tech Lab
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250617-event1@example.com
+DTSTART:20250617T080000
+DTEND:20250617T090000
+SUMMARY:Department All-Hands
+DESCRIPTION:Weekly department updates and announcements
+LOCATION:Main Auditorium
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250617-event2@example.com
+DTSTART:20250617T113000
+DTEND:20250617T130000
+SUMMARY:Vendor Negotiation Call
+DESCRIPTION:Contract terms discussion with software vendor
+LOCATION:Phone Conference
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250617-event3@example.com
+DTSTART:20250617T150000
+DTEND:20250617T163000
+SUMMARY:User Experience Workshop
+DESCRIPTION:Design thinking session for new user interface
+LOCATION:Design Studio
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250618-event1@example.com
+DTSTART:20250618T083000
+DTEND:20250618T100000
+SUMMARY:Quality Assurance Review
+DESCRIPTION:Testing protocols and quality standards assessment
+LOCATION:QA Lab
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250618-event2@example.com
+DTSTART:20250618T120000
+DTEND:20250618T133000
+SUMMARY:Customer Feedback Session
+DESCRIPTION:Review of customer surveys and feedback analysis
+LOCATION:Customer Success Office
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250618-event3@example.com
+DTSTART:20250618T143000
+DTEND:20250618T160000
+SUMMARY:Security Audit Meeting
+DESCRIPTION:IT security review and compliance discussion
+LOCATION:IT Security Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250619-event1@example.com
+DTSTART:20250619T090000
+DTEND:20250619T103000
+SUMMARY:Product Development Sync
+DESCRIPTION:Feature prioritization and development roadmap
+LOCATION:Product Office
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250619-event2@example.com
+DTSTART:20250619T133000
+DTEND:20250619T150000
+SUMMARY:HR Policy Training
+DESCRIPTION:Updated workplace policies and procedures training
+LOCATION:Training Room C
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250619-event3@example.com
+DTSTART:20250619T160000
+DTEND:20250619T170000
+SUMMARY:Weekly Retrospective
+DESCRIPTION:Team reflection on achievements and improvements
+LOCATION:Collaboration Space
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250620-event1@example.com
+DTSTART:20250620T080000
+DTEND:20250620T093000
+SUMMARY:Sales Pipeline Review
+DESCRIPTION:Weekly sales forecast and opportunity analysis
+LOCATION:Sales War Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250620-event2@example.com
+DTSTART:20250620T110000
+DTEND:20250620T123000
+SUMMARY:Partnership Strategy Meeting
+DESCRIPTION:Strategic alliance discussions and partnership planning
+LOCATION:Executive Conference Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250620-event3@example.com
+DTSTART:20250620T143000
+DTEND:20250620T160000
+SUMMARY:Innovation Brainstorm
+DESCRIPTION:Creative session for new product ideas and features
+LOCATION:Innovation Lab
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250621-event1@example.com
+DTSTART:20250621T093000
+DTEND:20250621T110000
+SUMMARY:Operational Excellence Review
+DESCRIPTION:Process improvement and operational efficiency analysis
+LOCATION:Operations Center
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250621-event2@example.com
+DTSTART:20250621T130000
+DTEND:20250621T143000
+SUMMARY:Technology Roadmap Planning
+DESCRIPTION:Future technology stack and infrastructure planning
+LOCATION:Tech Strategy Room
+STATUS:CONFIRMED
+END:VEVENT
+
+BEGIN:VEVENT
+UID:20250621-event3@example.com
+DTSTART:20250621T150000
+DTEND:20250621T163000
+SUMMARY:Week Wrap-up Meeting
+DESCRIPTION:Weekly achievements review and next week planning
+LOCATION:Team Meeting Room
+STATUS:CONFIRMED
+END:VEVENT
+
+END:VCALENDAR

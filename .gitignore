@@ -1,0 +1,15 @@
+# Python virtual environment
+.venv
+__pycache__
+*.pyc
+
+# Ruff
+*.ruff_cache
+
+# Project files
+data/calendar.ics
+data/tmp_calendar.ics
+production.env
+
+# MacOS 
+**/.DS_Store
