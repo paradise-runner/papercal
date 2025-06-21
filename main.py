@@ -55,7 +55,7 @@ def main():
         else:
             print("No changes in calendar, skipping image update.")
             return
-    save_calendar_image(events, "data/calendar.png")
+    save_calendar_image(events, "data/calendar.png", dithering="atkinson")
     print(f"Created calendar image with {len(events)} events")
     upload_epd_image("192.168.1.159", "data/calendar.png", 800, 480)
 
