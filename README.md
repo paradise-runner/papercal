@@ -70,9 +70,13 @@ PaperCal is a python tool for generating beautiful calendars from .ics files tha
 - Ideally you want to run the python script on a server or a machine that is always on, so the calendar can be updated regularly. 🖥️
 - I recommend running the script as a cronjob to ensure it runs at regular intervals. For example, you can run it every hour by adding the following line to your crontab:
     ```bash
-    3 7-18 * * 1-5 uv run /path/to/papercal/main.py
+    # get the location of the installed `uv`
+    which uv
+
+    # then update the cron tab with `crontab -e`
+    3 7-18 * * 1-5 cd /path/to/papercal && uv run main.py
     ```
-    - This will run the sc⌨️ript every hour from 7am to 6pm on weekdays, which is when I want to see the calendar updated. You can adjust the timing as needed.
+    - This will run the script every hour from 7am to 6pm on weekdays, which is when I want to see the calendar updated. You can adjust the timing as needed.
 
 ## Extra Bits 🎁
 - To generate a new gif, swap `main()` for `generate_example_calendar()` in `__if name__ == "__main__":` in `main.py`, run the script, and then use `ffmpeg` to convert the images to a gif:
