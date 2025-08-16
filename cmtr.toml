@@ -1,0 +1,6 @@
+[model]
+default = "gemma3:latest"
+
+[fallback_models]
+ollama = [ "gemma3n:latest", "deepseek-r1:latest", "qwen3:latest",]
+mlx = []
