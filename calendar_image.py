@@ -14,7 +14,6 @@ def create_weekly_calendar_image(
     if current_weekday is None:
         # Use current weekday if not provided
         current_weekday = current_date.weekday()
-    print(f"Current weekday: {current_weekday} (0=Monday, 6=Sunday)")
     is_weekday = current_weekday < 5
 
     if not is_weekday:
