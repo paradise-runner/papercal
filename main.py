@@ -1,6 +1,7 @@
 import os
 import requests
 from pathlib import Path
+from datetime import datetime
 
 from parse_ical import parse_calendar_events
 from calendar_image import save_calendar_image
@@ -54,8 +55,13 @@ def main():
             print("Calendar has changed, updating image...")
             events = new_events
         else:
-            print("No changes in calendar, skipping image update.")
-            return
+            current_date = datetime.now()
+            if current_date.hour <= 7:
+                # If it's before or currently 7am, update the image to reflect that a day needs to be overwritten
+                events = new_events
+            else:
+                print("No changes in calendar, skipping image update.")
+                return
     save_calendar_image(events, "data/calendar.png", dithering="atkinson")
     print(f"Created calendar image with {len(events)} events")
     upload_epd_image("192.168.1.159", "data/calendar.png", 800, 480)
