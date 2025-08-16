@@ -47,7 +47,10 @@ def upload_epd_image(ip_address, image_path, epd_width, epd_height):
     if not image_pixels:
         return
 
-    spinner = Halo(text=f"Uploading image to EPD at {base_url} ({epd_width}x{epd_height})", spinner='dots')
+    spinner = Halo(
+        text=f"Uploading image to EPD at {base_url} ({epd_width}x{epd_height})",
+        spinner="dots",
+    )
     spinner.start()
 
     try:

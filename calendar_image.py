@@ -45,7 +45,8 @@ def create_weekly_calendar_image(
     try:
         font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 12)
         header_font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 14)
-    except:
+    except Exception as e:
+        print(f"Error loading fonts: {e}, using default font.")
         font = ImageFont.load_default()
         header_font = ImageFont.load_default()
 
@@ -253,7 +254,9 @@ def atkinson_dither(img: Image.Image) -> Image.Image:
     return img.convert("1")
 
 
-def convert_to_black_and_white(img: Image.Image, method: str = "atkinson") -> Image.Image:
+def convert_to_black_and_white(
+    img: Image.Image, method: str = "atkinson"
+) -> Image.Image:
     """
     Convert the image to black and white using the specified dithering method.
     method: 'floyd' (default) or 'atkinson'
@@ -316,7 +319,7 @@ def get_weekly_image(photos_folder="./photos", week_number: int = None) -> Image
     hash_hex = hash_object.hexdigest()
 
     # Convert hash to integer for indexing
-    hash_int = int(hash_hex, 16)
+    int(hash_hex, 16)
 
     # Calculate cycle position to ensure no repeats within a full cycle
     num_images = len(images)
@@ -326,7 +329,7 @@ def get_weekly_image(photos_folder="./photos", week_number: int = None) -> Image
     # Use hash to create pseudo-random order within each cycle
     cycle_seed = f"cycle_{cycle_number}"
     cycle_hash = hashlib.md5(cycle_seed.encode()).hexdigest()
-    cycle_hash_int = int(cycle_hash, 16)
+    int(cycle_hash, 16)
 
     # Generate a pseudo-random permutation for this cycle
     indices = list(range(num_images))
