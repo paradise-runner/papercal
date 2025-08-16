@@ -9,6 +9,7 @@ __pycache__
 # Project files
 data/calendar.ics
 data/tmp_calendar.ics
+data/calendar.png
 production.env
 
 # MacOS 

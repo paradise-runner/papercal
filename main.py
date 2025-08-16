@@ -43,12 +43,15 @@ def main():
             return
         events = parse_calendar_events("data/calendar.ics")
     else:
-        fetch_ical_file(I_CAL_ADDRESS, "data/tmp_calendar.ics")
         print("Existing calendar file found, checking for updates...")
+        fetch_ical_file(I_CAL_ADDRESS, "data/tmp_calendar.ics")
         old_events = parse_calendar_events("data/calendar.ics")
         new_events = parse_calendar_events("data/tmp_calendar.ics")
-        os.remove("data/tmp_calendar.ics")
+        # replace old calendar with new calendar
+        os.remove("data/calendar.ics")
+        os.rename("data/tmp_calendar.ics", "data/calendar.ics")
         if old_events != new_events:
+            print("Calendar has changed, updating image...")
             events = new_events
         else:
             print("No changes in calendar, skipping image update.")

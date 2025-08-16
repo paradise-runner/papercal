@@ -1,5 +1,6 @@
 import requests
 from PIL import Image
+from halo import Halo
 
 
 def byte_to_str(v):
@@ -19,8 +20,7 @@ def prepare_image_data(image_path, target_width, target_height):
     Assumes pixels are either 0 (white/default) or 1 (black/inverted).
     """
     try:
-        img = Image.open(image_path).convert("1")  # Convert to 1-bit image
-        img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        img = Image.open(image_path)
         # Get pixel data; 0 for white, 255 for black in '1' mode
         # We need 0 to be the "transparent" or "off" color (value of c),
         # so let's map 255 (black) to 1 and 0 (white) to 0.
@@ -47,67 +47,64 @@ def upload_epd_image(ip_address, image_path, epd_width, epd_height):
     if not image_pixels:
         return
 
-    print(
-        f"Attempting to upload image to EPD at {base_url} with dimensions {epd_width}x{epd_height}"
-    )
+    spinner = Halo(text=f"Uploading image to EPD at {base_url} ({epd_width}x{epd_height})", spinner='dots')
+    spinner.start()
 
-    # 2. Send initial EPD configuration request
-    initial_cmd = "EPDw_"
-    initial_url = base_url + initial_cmd
-
-    print(f"Sending initial command: {initial_url}")
     try:
-        response = requests.post(initial_url, data="", timeout=5)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        print(
-            f"Initial command '{initial_cmd}' sent successfully. Status: {response.status_code}"
-        )
-    except Exception as e:
-        print(f"Error sending initial command: {e}")
-        return
+        # 2. Send initial EPD configuration request
+        initial_cmd = "EPDw_"
+        initial_url = base_url + initial_cmd
 
-    # 3. Send image data in chunks
-    px_ind = 0
-    c_value = 0  # For epdInd 27, u_data uses c=0
-
-    while px_ind < len(image_pixels):
-        rq_msg = ""
-        # Process 8 pixels into one byte
-        while px_ind < len(image_pixels) and len(rq_msg) < 1000:
-            v = 0
-            for i in range(8):
-                if px_ind < len(image_pixels):
-                    # If pixel value is NOT 'c_value', set the bit
-                    if image_pixels[px_ind] != c_value:
-                        v |= 128 >> i
-                    px_ind += 1
-            rq_msg += byte_to_str(v)
-
-        # Construct the data upload URL
-        # The JS function u_show uses rqMsg + wordToStr(rqMsg.length) + 'LOAD_'
-        # The `wordToStr(rqMsg.length)` encodes the length of the *encoded* data string.
-        data_upload_url = base_url + rq_msg + word_to_str(len(rq_msg)) + "LOAD_"
-
-        print(
-            f"Sending data chunk (length: {len(rq_msg)}): {data_upload_url[:100]}..."
-        )  # Print only part of URL
-
+        spinner.text = "Sending initial command..."
         try:
-            response = requests.post(data_upload_url, data="", timeout=10)
+            response = requests.post(initial_url, data="", timeout=5)
             response.raise_for_status()
-            print(
-                f"Data chunk sent. Progress: {round(px_ind / len(image_pixels) * 100, 2)}%"
-            )
         except Exception as e:
-            print(f"Error sending data chunk: {e}")
+            spinner.fail(f"Error sending initial command: {e}")
             return
 
-    # 4. Send final SHOW command
-    show_url = base_url + "SHOW_"
-    print(f"Sending final command: {show_url}")
-    try:
-        response = requests.post(show_url, data="", timeout=8)
-        response.raise_for_status()
-        print(f"Image upload complete! Status: {response.status_code}")
+        # 3. Send image data in chunks
+        px_ind = 0
+        c_value = 0  # For epdInd 27, u_data uses c=0
+        total_pixels = len(image_pixels)
+
+        while px_ind < total_pixels:
+            rq_msg = ""
+            # Process 8 pixels into one byte
+            while px_ind < total_pixels and len(rq_msg) < 1000:
+                v = 0
+                for i in range(8):
+                    if px_ind < total_pixels:
+                        # If pixel value is NOT 'c_value', set the bit
+                        if image_pixels[px_ind] != c_value:
+                            v |= 128 >> i
+                        px_ind += 1
+                rq_msg += byte_to_str(v)
+
+            # Construct the data upload URL
+            data_upload_url = base_url + rq_msg + word_to_str(len(rq_msg)) + "LOAD_"
+
+            progress = round(px_ind / total_pixels * 100, 1)
+            spinner.text = f"Uploading image data... {progress}%"
+
+            try:
+                response = requests.post(data_upload_url, data="", timeout=10)
+                response.raise_for_status()
+            except Exception as e:
+                spinner.fail(f"Error sending data chunk: {e}")
+                return
+
+        # 4. Send final SHOW command
+        spinner.text = "Finalizing upload..."
+        show_url = base_url + "SHOW_"
+        try:
+            response = requests.post(show_url, data="", timeout=8)
+            response.raise_for_status()
+            spinner.succeed("Image upload complete!")
+        except Exception as e:
+            spinner.fail(f"Error sending SHOW command: {e}")
+
+    except KeyboardInterrupt:
+        spinner.fail("Upload cancelled by user")
     except Exception as e:
-        print(f"Error sending SHOW command: {e}")
+        spinner.fail(f"Unexpected error: {e}")

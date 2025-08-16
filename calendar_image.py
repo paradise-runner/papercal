@@ -253,7 +253,7 @@ def atkinson_dither(img: Image.Image) -> Image.Image:
     return img.convert("1")
 
 
-def convert_to_black_and_white(img: Image.Image, method: str = "floyd") -> Image.Image:
+def convert_to_black_and_white(img: Image.Image, method: str = "atkinson") -> Image.Image:
     """
     Convert the image to black and white using the specified dithering method.
     method: 'floyd' (default) or 'atkinson'
