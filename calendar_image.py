@@ -6,7 +6,7 @@ import os
 
 
 def create_weekly_calendar_image(
-    events: List[Dict], dithering="floyd", current_weekday=None
+    events: List[Dict], dithering="atkinson", current_weekday=None
 ) -> Image.Image:
     # Load random photo and convert to black and white/cropped
     photo_img = get_weekly_image()
@@ -267,7 +267,7 @@ def convert_to_black_and_white(img: Image.Image, method: str = "floyd") -> Image
 def save_calendar_image(
     events: List[Dict],
     output_path: str = "calendar.png",
-    dithering: str = "floyd",
+    dithering: str = "atkinson",
     current_weekday: int = None,
 ) -> None:
     """
