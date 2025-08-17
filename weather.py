@@ -148,15 +148,6 @@ def get_default_weather_data() -> List[Dict]:
     start_of_week = today - timedelta(days=today.weekday())
 
     default_data = []
-    icons = [
-        "sun.svg",
-        "cloudy.svg",
-        "cloud-sun.svg",
-        "umbrella.svg",
-        "snowflake.svg",
-        "wind.svg",
-        "zap.svg",
-    ]
 
     for i in range(7):
         date = start_of_week + timedelta(days=i)
