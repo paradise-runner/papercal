@@ -25,7 +25,7 @@ def create_weekly_calendar_image(
 
     # This seems iffy, may adjust implementation to include timezones?
     # If its past 6pm on a Friday, return black and white photo, cropped to 800x480
-    if current_weekday == 4 and current_date.hour >= 18:
+    if current_weekday == 5 and current_date.hour >= 18:
         bw_photo = convert_to_black_and_white(
             crop_photo(photo_img, is_weekday=False).resize((800, 480)), method=dithering
         )

@@ -12,5 +12,10 @@ data/tmp_calendar.ics
 data/calendar.png
 production.env
 
+# AI Project Management
+CLAUDE.md
+AGENTS.md
+.github/copilot-instructions.md
+
 # MacOS 
 **/.DS_Store
