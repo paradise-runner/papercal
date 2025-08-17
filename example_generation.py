@@ -18,9 +18,13 @@ def generate_example_calendar(location: str = None):
         coords = geocode_location(location)
         if coords:
             latitude, longitude = coords
-            print(f"Generating examples for location: {location} ({latitude:.4f}, {longitude:.4f})")
+            print(
+                f"Generating examples for location: {location} ({latitude:.4f}, {longitude:.4f})"
+            )
         else:
-            print(f"Could not find location '{location}', using default (Fort Collins, CO)")
+            print(
+                f"Could not find location '{location}', using default (Fort Collins, CO)"
+            )
     else:
         print("Generating examples for default location: Fort Collins, CO")
 
@@ -32,12 +36,20 @@ def generate_example_calendar(location: str = None):
     # no need to commit example data we can generate
     os.remove("data/example.ics")
     save_calendar_image(
-        events, "example-calendars/floyd-steinberg-calendar.png", dithering="floyd", latitude=latitude, longitude=longitude
+        events,
+        "example-calendars/floyd-steinberg-calendar.png",
+        dithering="floyd",
+        latitude=latitude,
+        longitude=longitude,
     )
     save_calendar_image(
-        events, "example-calendars/atkinson-calendar.png", dithering="atkinson", latitude=latitude, longitude=longitude
+        events,
+        "example-calendars/atkinson-calendar.png",
+        dithering="atkinson",
+        latitude=latitude,
+        longitude=longitude,
     )
-    
+
     def generate_day_calendar(days):
         save_calendar_image(
             events,
@@ -47,7 +59,7 @@ def generate_example_calendar(location: str = None):
             latitude=latitude,
             longitude=longitude,
         )
-    
+
     with ThreadPoolExecutor() as executor:
         executor.map(generate_day_calendar, range(6))
 

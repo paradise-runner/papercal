@@ -22,7 +22,11 @@ def svg_to_png(svg_path: str, png_path: str, width: int = 24, height: int = 24) 
 
 
 def create_weekly_calendar_image(
-    events: List[Dict], dithering="atkinson", current_weekday=None, latitude=None, longitude=None
+    events: List[Dict],
+    dithering="atkinson",
+    current_weekday=None,
+    latitude=None,
+    longitude=None,
 ) -> Image.Image:
     # Load random photo and convert to black and white/cropped
     photo_img = get_weekly_image()
@@ -353,7 +357,11 @@ def save_calendar_image(
     Create and save the calendar image
     """
     img = create_weekly_calendar_image(
-        events, dithering=dithering, current_weekday=current_weekday, latitude=latitude, longitude=longitude
+        events,
+        dithering=dithering,
+        current_weekday=current_weekday,
+        latitude=latitude,
+        longitude=longitude,
     )
     img.save(output_path)
 

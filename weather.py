@@ -11,18 +11,13 @@ def geocode_location(location: str) -> Optional[Tuple[float, float]]:
     Returns (latitude, longitude) tuple or None if not found
     """
     url = "https://geocoding-api.open-meteo.com/v1/search"
-    params = {
-        "name": location,
-        "count": 1,
-        "language": "en",
-        "format": "json"
-    }
-    
+    params = {"name": location, "count": 1, "language": "en", "format": "json"}
+
     try:
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        
+
         if data.get("results") and len(data["results"]) > 0:
             result = data["results"][0]
             return (result["latitude"], result["longitude"])
@@ -109,7 +104,7 @@ def get_weather_icon(weather_code: int, date: str = None) -> str:
         "snowflake.svg",
         "wind.svg",
         "zap.svg",
-        "haze.svg"
+        "haze.svg",
     ]
 
     # Use date as seed for deterministic selection
@@ -139,7 +134,7 @@ def get_weather_icon(weather_code: int, date: str = None) -> str:
     else:
         # Default to deterministic icon for unknown codes
         result = random.choice(icons)
-    
+
     # Reset random seed to avoid affecting other random operations
     random.seed()
     return result

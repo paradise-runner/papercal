@@ -47,7 +47,9 @@ def main(location: str = None):
             latitude, longitude = coords
             print(f"Using location: {location} ({latitude:.4f}, {longitude:.4f})")
         else:
-            print(f"Could not find location '{location}', using default (Fort Collins, CO)")
+            print(
+                f"Could not find location '{location}', using default (Fort Collins, CO)"
+            )
     else:
         print("Using default location: Fort Collins, CO")
 
@@ -77,7 +79,13 @@ def main(location: str = None):
             else:
                 print("No changes in calendar, skipping image update.")
                 return
-    save_calendar_image(events, "data/calendar.png", dithering="atkinson", latitude=latitude, longitude=longitude)
+    save_calendar_image(
+        events,
+        "data/calendar.png",
+        dithering="atkinson",
+        latitude=latitude,
+        longitude=longitude,
+    )
     print(f"Created calendar image with {len(events)} events")
     upload_epd_image("192.168.1.159", "data/calendar.png", 800, 480)
 
