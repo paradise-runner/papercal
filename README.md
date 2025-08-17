@@ -6,6 +6,35 @@
 
 PaperCal is a python tool for generating beautiful calendars from .ics files that get progressively overlaid with dithered images and sent to an e-ink display powered by an esp32. Parts of the library are hardcoded to specific hardware and display sizes, but the core functionality is designed to be flexible and adaptable to different setups.
 
+## Key Features ✨
+
+### Progressive Image Revelation 🌅
+- Photos are progressively revealed as weekdays pass, creating a dynamic visual experience
+- Weekdays show calendar grid with events overlaid with progressive photo sections
+- Weekends and after 6pm Friday display full dithered photos
+- Past days are grayed out and covered with completed dithered photo sections
+
+### Smart Calendar Updates 🔄
+- Only regenerates calendar when events change or during early morning hours (≤7am)
+- Intelligent caching prevents unnecessary image generation
+- Automatic timezone handling (America/Denver) for accurate event display
+
+### Advanced Image Processing 🎨
+- **Dithering Algorithms**: Support for both Atkinson (default) and Floyd-Steinberg dithering methods
+- **Deterministic Photo Selection**: Photos are selected based on week number using MD5 hashing for consistent weekly displays
+- **Optimal Display Sizing**: Images automatically resized to fit 800x480 e-paper display (740x430 for weekday overlay)
+
+### Weather Integration 🌤️
+- Real-time weather data from Open-Meteo API (no API key required)
+- Customizable location support via CLI
+- Weather icons processed and integrated into calendar display
+
+### Calendar Features 📅
+- **Full iCal Support**: Handles recurring events with RRULE processing
+- **Timezone Conversions**: Proper handling of timezone data and conversions
+- **Event Overlays**: Time-based event positioning with overlap handling
+- **Recurrence Exceptions**: Processes EXDATE exclusions and moved events
+
 ### Inspiration 
 - Calendar 📅
     - After missing a few important events, I wanted to create a calendar that would always be visible and up to date, without having to depend on notifications or screens that could be ignored.
@@ -62,6 +91,47 @@ PaperCal is a python tool for generating beautiful calendars from .ics files tha
    uv run main.py
    ```
 
+## CLI Options 🛠️
+
+PaperCal supports several command-line options to customize its behavior:
+
+### Basic Usage
+```bash
+# Generate calendar with default settings (Fort Collins, CO weather)
+uv run main.py
+
+# Generate example calendar images for development/testing
+uv run main.py --examples
+
+# Use custom location for weather data
+uv run main.py --location "New York, NY, United States"
+uv run main.py --location "Tokyo, Japan"
+```
+
+### Available Options
+- `--examples`: Generate synthetic calendar data and example images instead of using real calendar data. Creates images in `/example-calendars/` directory showing progressive day revelation
+- `--location "City, State, Country"`: Specify location for weather data. Uses Open-Meteo API to fetch weather information for the specified location
+
+## Development 👨‍💻
+
+### Code Quality Commands
+```bash
+# Lint code with ruff
+uv run ruff check
+
+# Format code with ruff
+uv run ruff format
+
+# Install/sync dependencies
+uv sync
+```
+
+### Project Structure
+- `/photos/` - Directory for overlay images (automatically selected via MD5 hashing)
+- `/data/` - Calendar data storage and caching
+- `/example-calendars/` - Generated example images when using `--examples` flag
+- `production.env` - Configuration file containing `I_CAL_ADDRESS`
+
 ### Usage Tips 💡
 - The script will fetch the calendar from the provided URL, generate a calendar for the current week, and send it to the ESP32 to be displayed on the e-paper display.
 - The calendar will be updated every ~hour with the latest events from the online source. 🔄
@@ -79,9 +149,33 @@ PaperCal is a python tool for generating beautiful calendars from .ics files tha
     - This will run the script every hour from 7am to 6pm on weekdays, which is when I want to see the calendar updated. You can adjust the timing as needed.
 
 ## Extra Bits 🎁
-- To generate a new gif, run the main.py file with a `--examples` flag to only generate example data, and then use `ffmpeg` to convert the images to a gif:
-    ```bash
-    ffmpeg -framerate 1 -pattern_type glob -i '/some/path/to/papercal/example-calendars/day-*-calendar.png' calendar.gif
-    ```
-- 🖤 PaperCal supports both Atkinson and Floyd dithering methods for image processing. 🤍
-- You can find more of my work at my personal site 🚀 [hec.works](https://hec.works) or on [GitHub](https://github.com/paradise-runner). 
+
+### Creating Animated Previews 🎬
+Generate a GIF showing the progressive image revelation:
+```bash
+# First generate example calendar images
+uv run main.py --examples
+
+# Convert to animated GIF using ffmpeg
+ffmpeg -framerate 1 -pattern_type glob -i '/path/to/papercal/example-calendars/day-*-calendar.png' calendar.gif
+```
+
+### Example Generation Features 📸
+When using `--examples` flag, PaperCal creates:
+- Synthetic calendar data in `/data/example.ics` for testing
+- Daily progression images showing how photos are revealed over the week
+- Comparison images for both Atkinson and Floyd-Steinberg dithering methods
+- Demonstration of weekend vs weekday display modes
+
+### Technical Details 🔧
+- **Display Specifications**: Designed for 7.5" Waveshare e-paper display (800x480 pixels)
+- **Hardcoded ESP32 IP**: `192.168.1.159` (configurable in code)
+- **Timezone**: America/Denver for event processing
+- **Update Logic**: Smart updates only when events change or during early morning (≤7am)
+- **Photo Selection**: Deterministic selection based on week number using MD5 hashing
+
+### Dithering Methods 🎨
+- **Atkinson** (default): Provides smoother gradients with artistic quality
+- **Floyd-Steinberg**: Offers more detailed representation with error diffusion
+
+You can find more of my work at my personal site 🚀 [hec.works](https://hec.works) or on [GitHub](https://github.com/paradise-runner). 
