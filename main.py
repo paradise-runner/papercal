@@ -9,7 +9,7 @@ from calendar_image import save_calendar_image
 from image_to_esp import upload_epd_image
 from dotenv import load_dotenv
 from example_generation import generate_example_calendar
-
+from weather import geocode_location
 
 
 def fetch_ical_file(url: str, save_path: str) -> bool:
@@ -30,7 +30,7 @@ def fetch_ical_file(url: str, save_path: str) -> bool:
         return False
 
 
-def main():
+def main(location: str = None):
     # Load environment variables from .env file
     load_dotenv("production.env")
     I_CAL_ADDRESS = os.getenv("I_CAL_ADDRESS")
@@ -38,6 +38,18 @@ def main():
         raise ValueError(
             "I_CAL_ADDRESS environment variable is not set. Please set it in the .env file."
         )
+
+    # Get coordinates for location if provided
+    latitude, longitude = None, None
+    if location:
+        coords = geocode_location(location)
+        if coords:
+            latitude, longitude = coords
+            print(f"Using location: {location} ({latitude:.4f}, {longitude:.4f})")
+        else:
+            print(f"Could not find location '{location}', using default (Fort Collins, CO)")
+    else:
+        print("Using default location: Fort Collins, CO")
 
     if not os.path.exists("data/calendar.ics"):
         print("No existing calendar file found, fetching from iCal address...")
@@ -65,22 +77,29 @@ def main():
             else:
                 print("No changes in calendar, skipping image update.")
                 return
-    save_calendar_image(events, "data/calendar.png", dithering="atkinson")
+    save_calendar_image(events, "data/calendar.png", dithering="atkinson", latitude=latitude, longitude=longitude)
     print(f"Created calendar image with {len(events)} events")
     upload_epd_image("192.168.1.159", "data/calendar.png", 800, 480)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate calendar images for e-paper display")
-    parser.add_argument(
-        "--examples", 
-        action="store_true", 
-        help="Generate example calendar images instead of running main function"
+    parser = argparse.ArgumentParser(
+        description="Generate calendar images for e-paper display"
     )
-    
+    parser.add_argument(
+        "--examples",
+        action="store_true",
+        help="Generate example calendar images instead of running main function",
+    )
+    parser.add_argument(
+        "--location",
+        type=str,
+        help="Location for weather data (e.g., 'Fort Collins, CO, United States'). Defaults to Fort Collins, CO.",
+    )
+
     args = parser.parse_args()
-    
+
     if args.examples:
-        generate_example_calendar()
+        generate_example_calendar(location=args.location)
     else:
-        main()
+        main(location=args.location)

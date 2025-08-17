@@ -3,10 +3,26 @@ from datetime import datetime
 from typing import List, Dict
 import hashlib
 import os
+import cairosvg
+import tempfile
+from weather import get_weather_data
+
+
+def svg_to_png(svg_path: str, png_path: str, width: int = 24, height: int = 24) -> None:
+    """
+    Convert SVG file to PNG using cairosvg with proper transparency handling
+    """
+    cairosvg.svg2png(
+        url=svg_path,
+        write_to=png_path,
+        output_width=width,
+        output_height=height,
+        background_color="white",  # Set white background for proper contrast
+    )
 
 
 def create_weekly_calendar_image(
-    events: List[Dict], dithering="atkinson", current_weekday=None
+    events: List[Dict], dithering="atkinson", current_weekday=None, latitude=None, longitude=None
 ) -> Image.Image:
     # Load random photo and convert to black and white/cropped
     photo_img = get_weekly_image()
@@ -58,12 +74,71 @@ def create_weekly_calendar_image(
         y = margin + (i * hour_height)
         draw.line([(margin, y), (800, y)], fill=0, width=2)
 
+    # Get weather data for the week
+    try:
+        weather_data = get_weather_data(latitude, longitude)
+        # Get Monday-Friday weather data (weekdays only)
+        weekday_weather = weather_data[:5]  # First 5 days (Mon-Fri)
+    except Exception as e:
+        print(f"Error getting weather data: {e}")
+        weekday_weather = []
+
     # Add day labels with larger font and gray out past days
     days = ["MON", "TUE", "WED", "THU", "FRI"]
     for i, day in enumerate(days):
         x = margin + (i * day_width) + (day_width / 2)
         text_color = 128 if i < current_weekday else 0  # Gray text for past days
+
+        # Draw day label
         draw.text((x - 15, margin - 25), day, fill=text_color, font=header_font)
+
+        # Add weather info if available
+        if i < len(weekday_weather):
+            weather = weekday_weather[i]
+
+            # Draw weather icon
+            weather_icon_path = f"./weather_icons/{weather['icon']}"
+            if os.path.exists(weather_icon_path):
+                # Create temporary PNG file
+                with tempfile.NamedTemporaryFile(
+                    suffix=".png", delete=False
+                ) as temp_png:
+                    try:
+                        svg_to_png(weather_icon_path, temp_png.name, 20, 20)
+                        weather_icon = Image.open(temp_png.name)
+
+                        # Convert to grayscale and invert for proper contrast on white background
+                        if weather_icon.mode == "RGBA":
+                            # Convert RGBA to RGB with white background first
+                            white_bg = Image.new(
+                                "RGB", weather_icon.size, (255, 255, 255)
+                            )
+                            white_bg.paste(
+                                weather_icon, mask=weather_icon.split()[-1]
+                            )  # Use alpha channel as mask
+                            weather_icon = white_bg
+
+                        # Convert to grayscale
+                        weather_icon = weather_icon.convert("L")
+
+                        # Position icon above day label
+                        icon_x = int(x - 10)
+                        icon_y = int(margin - 50)
+                        img.paste(weather_icon, (icon_x, icon_y))
+                    except Exception as e:
+                        print(f"Error rendering weather icon: {e}")
+                    finally:
+                        # Clean up temporary PNG file
+                        try:
+                            os.unlink(temp_png.name)
+                        except OSError:
+                            pass
+
+            # Draw temperature range
+            temp_text = f"{int(weather['temp_min'])}°-{int(weather['temp_max'])}°"
+            temp_width = font.getlength(temp_text)
+            temp_x = x - (temp_width / 2)
+            draw.text((temp_x, margin - 70), temp_text, fill=text_color, font=font)
 
     # Add hour labels
     for i in range(11):
@@ -271,12 +346,14 @@ def save_calendar_image(
     output_path: str = "calendar.png",
     dithering: str = "atkinson",
     current_weekday: int = None,
+    latitude: float = None,
+    longitude: float = None,
 ) -> None:
     """
     Create and save the calendar image
     """
     img = create_weekly_calendar_image(
-        events, dithering=dithering, current_weekday=current_weekday
+        events, dithering=dithering, current_weekday=current_weekday, latitude=latitude, longitude=longitude
     )
     img.save(output_path)
 
