@@ -12,6 +12,9 @@ data/tmp_calendar.ics
 data/calendar.png
 production.env
 
+# Testing
+.pytest_cache
+
 # AI Project Management
 CLAUDE.md
 AGENTS.md

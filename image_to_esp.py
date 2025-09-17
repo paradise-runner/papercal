@@ -17,16 +17,14 @@ def prepare_image_data(image_path, target_width, target_height):
     """
     Loads an image, converts it to 1-bit monochrome (0 or 1),
     and flattens it into a 1D array suitable for the EPD.
-    Assumes pixels are either 0 (white/default) or 1 (black/inverted).
+    Uses threshold of 128 to convert grayscale to binary.
     """
     try:
         img = Image.open(image_path)
-        # Get pixel data; 0 for white, 255 for black in '1' mode
-        # We need 0 to be the "transparent" or "off" color (value of c),
-        # so let's map 255 (black) to 1 and 0 (white) to 0.
         pixel_data = []
         for pixel in img.getdata():
-            pixel_data.append(1 if pixel == 255 else 0)
+            # Use threshold of 128: values >= 128 become white (0), < 128 become black (1)
+            pixel_data.append(1 if pixel >= 128 else 0)
         return pixel_data
     except FileNotFoundError:
         print(f"Error: Image file not found at {image_path}")
