@@ -97,14 +97,14 @@ def get_weather_icon(weather_code: int, date: str = None) -> str:
 
     # Available icons
     icons = [
-        "sun.svg",
-        "cloudy.svg",
-        "cloud-sun.svg",
-        "umbrella.svg",
-        "snowflake.svg",
-        "wind.svg",
-        "zap.svg",
-        "haze.svg",
+        "sun.png",
+        "cloudy.png",
+        "cloud-sun.png",
+        "umbrella.png",
+        "snowflake.png",
+        "wind.png",
+        "zap.png",
+        "haze.png",
     ]
 
     # Use date as seed for deterministic selection
@@ -114,23 +114,23 @@ def get_weather_icon(weather_code: int, date: str = None) -> str:
         random.seed(seed)
 
     if weather_code in [0, 1]:  # Clear sky, mainly clear
-        result = "sun.svg"
+        result = "sun.png"
     elif weather_code in [2]:  # Partly cloudy
-        result = "cloud-sun.svg"
+        result = "cloud-sun.png"
     elif weather_code in [3]:  # overcast
-        result = "cloudy.svg"
+        result = "cloudy.png"
     elif weather_code in [45, 48]:  # Fog
-        result = "haze.svg"
+        result = "haze.png"
     elif weather_code in [51, 53, 55, 56, 57]:  # Drizzle
-        result = "umbrella.svg"
+        result = "umbrella.png"
     elif weather_code in [61, 63, 65, 66, 67]:  # Rain
-        result = "umbrella.svg"
+        result = "umbrella.png"
     elif weather_code in [71, 73, 75, 77, 85, 86]:  # Snow
-        result = "snowflake.svg"
+        result = "snowflake.png"
     elif weather_code in [80, 81, 82]:  # Rain showers
-        result = "umbrella.svg"
+        result = "umbrella.png"
     elif weather_code in [95, 96, 99]:  # Thunderstorm
-        result = "zap.svg"
+        result = "zap.png"
     else:
         # Default to deterministic icon for unknown codes
         result = random.choice(icons)

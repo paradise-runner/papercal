@@ -30,7 +30,7 @@ def fetch_ical_file(url: str, save_path: str) -> bool:
         return False
 
 
-def main(location: str = None):
+def main(location: str = None, force_update: bool = False):
     # Load environment variables from .env file
     load_dotenv("production.env")
     I_CAL_ADDRESS = os.getenv("I_CAL_ADDRESS")
@@ -71,6 +71,9 @@ def main(location: str = None):
         if old_events != new_events:
             print("Calendar has changed, updating image...")
             events = new_events
+        elif force_update:
+            print("Force update requested, updating image...")
+            events = new_events
         else:
             current_date = datetime.now()
             if current_date.hour <= 7:
@@ -104,10 +107,15 @@ if __name__ == "__main__":
         type=str,
         help="Location for weather data (e.g., 'Fort Collins, CO, United States'). Defaults to Fort Collins, CO.",
     )
+    parser.add_argument(
+        "--update",
+        action="store_true",
+        help="Force update the calendar image even if no changes are detected",
+    )
 
     args = parser.parse_args()
 
     if args.examples:
         generate_example_calendar(location=args.location)
     else:
-        main(location=args.location)
+        main(location=args.location, force_update=args.update)
