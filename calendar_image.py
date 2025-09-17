@@ -3,22 +3,7 @@ from datetime import datetime
 from typing import List, Dict
 import hashlib
 import os
-import cairosvg
-import tempfile
 from weather import get_weather_data
-
-
-def svg_to_png(svg_path: str, png_path: str, width: int = 24, height: int = 24) -> None:
-    """
-    Convert SVG file to PNG using cairosvg with proper transparency handling
-    """
-    cairosvg.svg2png(
-        url=svg_path,
-        write_to=png_path,
-        output_width=width,
-        output_height=height,
-        background_color="white",  # Set white background for proper contrast
-    )
 
 
 def create_weekly_calendar_image(
@@ -52,8 +37,9 @@ def create_weekly_calendar_image(
         return bw_photo
 
     # Weekday: proceed with calendar image
-    img = Image.new("L", (800, 480), 255)  # 'L' mode for grayscale
-    draw = ImageDraw.Draw(img)
+    img = Image.new("1", (800, 480), 255)  # 'L' mode for grayscale
+    draw = ImageDraw.Draw(img, mode="1")
+
 
     # Define dimensions
     margin = 50
@@ -95,48 +81,36 @@ def create_weekly_calendar_image(
 
         # Draw day label
         draw.text((x - 15, margin - 25), day, fill=text_color, font=header_font)
-
         # Add weather info if available
         if i < len(weekday_weather):
             weather = weekday_weather[i]
-
             # Draw weather icon
             weather_icon_path = f"./weather_icons/{weather['icon']}"
             if os.path.exists(weather_icon_path):
-                # Create temporary PNG file
-                with tempfile.NamedTemporaryFile(
-                    suffix=".png", delete=False
-                ) as temp_png:
-                    try:
-                        svg_to_png(weather_icon_path, temp_png.name, 20, 20)
-                        weather_icon = Image.open(temp_png.name)
+                try:
+                    weather_icon = Image.open(weather_icon_path)
 
-                        # Convert to grayscale and invert for proper contrast on white background
-                        if weather_icon.mode == "RGBA":
-                            # Convert RGBA to RGB with white background first
-                            white_bg = Image.new(
-                                "RGB", weather_icon.size, (255, 255, 255)
-                            )
-                            white_bg.paste(
-                                weather_icon, mask=weather_icon.split()[-1]
-                            )  # Use alpha channel as mask
-                            weather_icon = white_bg
+                    # Convert to grayscale and invert for proper contrast on white background
+                    if weather_icon.mode == "RGBA":
+                        # Convert RGBA to RGB with white background first
+                        white_bg = Image.new(
+                            "1", weather_icon.size, (255, 255, 255)
+                        )
+                        white_bg.paste(
+                            weather_icon, mask=weather_icon.split()[-1]
+                        )  # Use alpha channel as mask
+                        weather_icon = white_bg
 
-                        # Convert to grayscale
-                        weather_icon = weather_icon.convert("L")
+                    # Convert to 1-bit monochrome
+                    weather_icon = weather_icon.convert("1")
 
-                        # Position icon above day label
-                        icon_x = int(x - 10)
-                        icon_y = int(margin - 50)
-                        img.paste(weather_icon, (icon_x, icon_y))
-                    except Exception as e:
-                        print(f"Error rendering weather icon: {e}")
-                    finally:
-                        # Clean up temporary PNG file
-                        try:
-                            os.unlink(temp_png.name)
-                        except OSError:
-                            pass
+                    # Position icon above day label
+                    icon_x = int(x - 10)
+                    icon_y = int(margin - 50)
+                    img.paste(weather_icon, (icon_x, icon_y))
+                except Exception as e:
+                    print(f"Error rendering weather icon: {e}")
+
 
             # Draw temperature range
             temp_text = f"{int(weather['temp_min'])}°-{int(weather['temp_max'])}°"
@@ -221,11 +195,11 @@ def create_weekly_calendar_image(
             x1 += offset * 10
 
             # Adjust colors based on whether the day is in the past
-            border_color = 128 if is_past_day else 0  # Darker gray for past events
+            border_color = 0 if is_past_day else 0  # Darker gray for past events
             fill_color = (
-                240 if is_past_day else 255
+                0 if is_past_day else 0
             )  # Slightly gray fill for past events
-            text_color = 128 if is_past_day else 0  # Gray text for past events
+            text_color = 255 if is_past_day else 255  # Gray text for past events
 
             # Draw event rectangle with adjusted colors
             draw.rectangle(
