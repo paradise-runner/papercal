@@ -3,109 +3,58 @@ from PIL import Image
 from halo import Halo
 
 
-def byte_to_str(v):
-    """Converts a byte to a two-character string using base-16 ('a'-'p')."""
-    return chr((v & 0xF) + 97) + chr(((v >> 4) & 0xF) + 97)
-
-
-def word_to_str(v):
-    """Converts a 16-bit word to a four-character string."""
-    return byte_to_str(v & 0xFF) + byte_to_str((v >> 8) & 0xFF)
-
-
-def prepare_image_data(image_path, target_width, target_height):
+def prepare_image_data(image_path):
     """
-    Loads an image, converts it to 1-bit monochrome (0 or 1),
-    and flattens it into a 1D array suitable for the EPD.
-    Uses threshold of 128 to convert grayscale to binary.
+    Loads an image and converts it to a raw 1-bit packed bytearray.
+    800x480 pixels, 1 bit per pixel, MSB first. Total: 48000 bytes.
+    Pixel mapping: white (>= 128) → 0 bit, black (< 128) → 1 bit.
     """
-    try:
-        img = Image.open(image_path)
-        pixel_data = []
-        for pixel in img.getdata():
-            # Use threshold of 128: values >= 128 become white (0), < 128 become black (1)
-            pixel_data.append(1 if pixel >= 128 else 0)
-        return pixel_data
-    except FileNotFoundError:
-        print(f"Error: Image file not found at {image_path}")
-        return None
-    except Exception as e:
-        print(f"Error processing image: {e}")
-        return None
+    img = Image.open(image_path).convert("L")  # grayscale
+    pixels = img.getdata()
+    packed = bytearray(len(pixels) // 8)
+    for i in range(len(packed)):
+        byte = 0
+        for bit in range(8):
+            px = pixels[i * 8 + bit]
+            if px < 128:  # black pixel
+                byte |= 0x80 >> bit
+        packed[i] = byte
+    return packed
 
 
-def upload_epd_image(ip_address, image_path, epd_width, epd_height):
+def upload_epd_image(ip_address, image_path, epd_width=800, epd_height=480):
     """
-    Uploads an image to the EPD device for epdInd 27.
+    Uploads an image to the ESP32 e-Paper device.
+    Converts the image to 1-bit packed format and POSTs to /image.
     """
-    base_url = f"http://{ip_address}/"
-
-    # 1. Prepare image data
-    image_pixels = prepare_image_data(image_path, epd_width, epd_height)
-    if not image_pixels:
-        return
+    url = f"http://{ip_address}/image"
 
     spinner = Halo(
-        text=f"Uploading image to EPD at {base_url} ({epd_width}x{epd_height})",
+        text=f"Preparing image for EPD at {ip_address} ({epd_width}x{epd_height})",
         spinner="dots",
     )
     spinner.start()
 
     try:
-        # 2. Send initial EPD configuration request
-        initial_cmd = "EPDw_"
-        initial_url = base_url + initial_cmd
-
-        spinner.text = "Sending initial command..."
-        try:
-            response = requests.post(initial_url, data="", timeout=5)
-            response.raise_for_status()
-        except Exception as e:
-            spinner.fail(f"Error sending initial command: {e}")
+        image_data = prepare_image_data(image_path)
+        expected = epd_width * epd_height // 8
+        if len(image_data) != expected:
+            spinner.fail(f"Image data size mismatch: got {len(image_data)}, expected {expected}")
             return
 
-        # 3. Send image data in chunks
-        px_ind = 0
-        c_value = 0  # For epdInd 27, u_data uses c=0
-        total_pixels = len(image_pixels)
+        spinner.text = f"Uploading {len(image_data)} bytes to {url}..."
+        response = requests.post(
+            url,
+            data=bytes(image_data),
+            headers={"Content-Type": "application/octet-stream"},
+            timeout=30,
+        )
+        response.raise_for_status()
+        spinner.succeed("Image uploaded successfully!")
 
-        while px_ind < total_pixels:
-            rq_msg = ""
-            # Process 8 pixels into one byte
-            while px_ind < total_pixels and len(rq_msg) < 1000:
-                v = 0
-                for i in range(8):
-                    if px_ind < total_pixels:
-                        # If pixel value is NOT 'c_value', set the bit
-                        if image_pixels[px_ind] != c_value:
-                            v |= 128 >> i
-                        px_ind += 1
-                rq_msg += byte_to_str(v)
-
-            # Construct the data upload URL
-            data_upload_url = base_url + rq_msg + word_to_str(len(rq_msg)) + "LOAD_"
-
-            progress = round(px_ind / total_pixels * 100, 1)
-            spinner.text = f"Uploading image data... {progress}%"
-
-            try:
-                response = requests.post(data_upload_url, data="", timeout=10)
-                response.raise_for_status()
-            except Exception as e:
-                spinner.fail(f"Error sending data chunk: {e}")
-                return
-
-        # 4. Send final SHOW command
-        spinner.text = "Finalizing upload..."
-        show_url = base_url + "SHOW_"
-        try:
-            response = requests.post(show_url, data="", timeout=8)
-            response.raise_for_status()
-            spinner.succeed("Image upload complete!")
-        except Exception as e:
-            spinner.fail(f"Error sending SHOW command: {e}")
-
-    except KeyboardInterrupt:
-        spinner.fail("Upload cancelled by user")
+    except requests.exceptions.RequestException as e:
+        spinner.fail(f"Upload failed: {e}")
+    except FileNotFoundError:
+        spinner.fail(f"Image file not found: {image_path}")
     except Exception as e:
-        spinner.fail(f"Unexpected error: {e}")
+        spinner.fail(f"Error: {e}")
