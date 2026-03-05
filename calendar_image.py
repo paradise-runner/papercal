@@ -42,8 +42,9 @@ def create_weekly_calendar_image(
 
 
     # Define dimensions
-    margin = 50
-    day_width = (800 - margin) / 5  # 5 days
+    margin = 50  # top margin only (for day headers/weather)
+    left_margin = 0  # no left sidebar — times are on each event
+    day_width = (800 - left_margin) / 5  # 5 days
     hour_height = (480 - margin) / 10  # Show 8am - 6pm (10 hours)
 
     # Load fonts
@@ -57,12 +58,12 @@ def create_weekly_calendar_image(
 
     # Draw grid with solid black lines
     for i in range(6):  # Vertical lines
-        x = margin + (i * day_width)
+        x = left_margin + (i * day_width)
         draw.line([(x, margin), (x, 480)], fill=0, width=2)
 
     for i in range(11):  # Horizontal lines
         y = margin + (i * hour_height)
-        draw.line([(margin, y), (800, y)], fill=0, width=2)
+        draw.line([(left_margin, y), (800, y)], fill=0, width=2)
 
     # Get weather data for the week
     try:
@@ -76,7 +77,7 @@ def create_weekly_calendar_image(
     # Add day labels with larger font and gray out past days
     days = ["MON", "TUE", "WED", "THU", "FRI"]
     for i, day in enumerate(days):
-        x = margin + (i * day_width) + (day_width / 2)
+        x = left_margin + (i * day_width) + (day_width / 2)
         text_color = 128 if i < current_weekday else 0  # Gray text for past days
 
         # Draw day label
@@ -117,14 +118,6 @@ def create_weekly_calendar_image(
             temp_width = font.getlength(temp_text)
             temp_x = x - (temp_width / 2)
             draw.text((temp_x, margin - 70), temp_text, fill=text_color, font=font)
-
-    # Add hour labels
-    for i in range(11):
-        hour = i + 8  # Start at 8am
-        period = "AM" if hour < 12 else "PM"
-        display_hour = hour if hour <= 12 else hour - 12
-        y = margin + (i * hour_height)
-        draw.text((5, y - 8), f"{display_hour}{period}", fill=0, font=font)
 
     # Helper function for word wrapping
     def wrap_text(text: str, font: ImageFont, max_width: int) -> List[str]:
@@ -186,7 +179,7 @@ def create_weekly_calendar_image(
             active_times.append((start_hour, end_hour))
 
             # Calculate position with offset
-            x1 = margin + (day_idx * day_width)
+            x1 = left_margin + (day_idx * day_width)
             y1 = margin + (start_hour - 8) * hour_height
             x2 = x1 + day_width - (offset * 10)  # Reduce width for offset events
             y2 = margin + (end_hour - 8) * hour_height
@@ -231,19 +224,20 @@ def create_weekly_calendar_image(
                 draw.text((x1 + 5, y1 + 2), text, fill=text_color, font=font)
 
     # Overlay black and white cropped photo over prior days (including events)
+    photo_width = 800 - left_margin
+    photo_height = 480 - margin
     bw_photo = convert_to_black_and_white(
-        crop_photo(photo_img, is_weekday=True).resize((740, 430)), method=dithering
+        crop_photo(photo_img, is_weekday=True).resize((photo_width, photo_height)), method=dithering
     )
     if current_weekday > 0:
         # Calculate region for all past days as a single block
-        x1 = int(margin)
+        x1 = int(left_margin)
         y1 = int(margin)
         # Add 2 pixels to x2 to cover the grid line between days
-        x2 = int(margin + (current_weekday * day_width) + 8)
+        x2 = int(left_margin + (current_weekday * day_width) + 8)
         y2 = int(480)
         # Corresponding region in the photo
         photo_x1 = 0
-        # Add 2 pixels to photo_x2 to match the overlay width
         photo_x2 = int((current_weekday / 5) * bw_photo.width + 8)
         day_crop = bw_photo.crop(
             (photo_x1, 0, min(photo_x2, bw_photo.width), bw_photo.height)
@@ -281,7 +275,7 @@ def crop_photo(img: Image.Image, is_weekday: bool) -> Image.Image:
     Resize the photo to the appropriate size based on whether it's a weekday or weekend.
     No cropping, just resize to fit the target dimensions.
     """
-    target_width = 740 if is_weekday else 800
+    target_width = 800  # full width (no left sidebar)
     target_height = 430 if is_weekday else 480
     return img.resize((target_width, target_height), Image.LANCZOS)
 
