@@ -74,50 +74,51 @@ def create_weekly_calendar_image(
         print(f"Error getting weather data: {e}")
         weekday_weather = []
 
-    # Add day labels with larger font and gray out past days
+    # Load weather font to match icon size (~20px icons)
+    try:
+        weather_font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 16)
+    except Exception:
+        weather_font = font
+
+    # Add day labels with weather icon + temp above, day name below
     days = ["MON", "TUE", "WED", "THU", "FRI"]
     for i, day in enumerate(days):
-        x = left_margin + (i * day_width) + (day_width / 2)
-        text_color = 128 if i < current_weekday else 0  # Gray text for past days
+        col_center = left_margin + (i * day_width) + (day_width / 2)
+        text_color = 128 if i < current_weekday else 0
 
-        # Draw day label
-        draw.text((x - 15, margin - 25), day, fill=text_color, font=header_font)
-        # Add weather info if available
-        if i < len(weekday_weather):
+        # Row 1: icon + temp (centered as a group) — skip past days
+        icon_img = None
+        if i < len(weekday_weather) and i >= current_weekday:
             weather = weekday_weather[i]
-            # Draw weather icon
             weather_icon_path = f"./weather_icons/{weather['icon']}"
             if os.path.exists(weather_icon_path):
                 try:
                     weather_icon = Image.open(weather_icon_path)
-
-                    # Convert to grayscale and invert for proper contrast on white background
                     if weather_icon.mode == "RGBA":
-                        # Convert RGBA to RGB with white background first
-                        white_bg = Image.new(
-                            "1", weather_icon.size, (255, 255, 255)
-                        )
-                        white_bg.paste(
-                            weather_icon, mask=weather_icon.split()[-1]
-                        )  # Use alpha channel as mask
+                        white_bg = Image.new("1", weather_icon.size, (255, 255, 255))
+                        white_bg.paste(weather_icon, mask=weather_icon.split()[-1])
                         weather_icon = white_bg
-
-                    # Convert to 1-bit monochrome
-                    weather_icon = weather_icon.convert("1")
-
-                    # Position icon above day label
-                    icon_x = int(x - 10)
-                    icon_y = int(margin - 50)
-                    img.paste(weather_icon, (icon_x, icon_y))
+                    icon_img = weather_icon.convert("1")
                 except Exception as e:
                     print(f"Error rendering weather icon: {e}")
 
+            temp_text = f"{int(weather['temp_max'])}° / {int(weather['temp_min'])}°"
+            temp_width = weather_font.getlength(temp_text)
+            icon_w = icon_img.width if icon_img else 0
+            gap = 4  # space between icon and temp
+            group_width = icon_w + gap + temp_width
+            group_x = col_center - (group_width / 2)
 
-            # Draw temperature range
-            temp_text = f"{int(weather['temp_min'])}°-{int(weather['temp_max'])}°"
-            temp_width = font.getlength(temp_text)
-            temp_x = x - (temp_width / 2)
-            draw.text((temp_x, margin - 70), temp_text, fill=text_color, font=font)
+            # Draw icon
+            if icon_img:
+                img.paste(icon_img, (int(group_x), 2))
+
+            # Draw temp text vertically centered with icon
+            draw.text((int(group_x + icon_w + gap), 2), temp_text, fill=text_color, font=weather_font)
+
+        # Row 2: day label centered below
+        day_width_px = header_font.getlength(day)
+        draw.text((col_center - day_width_px / 2, 26), day, fill=text_color, font=header_font)
 
     # Helper function for word wrapping
     def wrap_text(text: str, font: ImageFont, max_width: int) -> List[str]:
